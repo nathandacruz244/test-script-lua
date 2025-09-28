@@ -1,0 +1,113 @@
+--[[
+    Death Ball Auto Parry Script (Mobile/Delta)
+    - Detecta quando a bola está próxima e ativa parry automaticamente.
+    - Interface movível, minimizável, liga/desliga.
+    - Uso autorizado para dev/testes internos.
+]]
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "DeathBallAutoParry"
+gui.ResetOnSpawn = false
+gui.Parent = game.CoreGui
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 220, 0, 100)
+frame.Position = UDim2.new(0.05,0,0.6,0)
+frame.BackgroundColor3 = Color3.fromRGB(30,30,30)
+frame.BorderSizePixel = 2
+frame.Active = true
+frame.Draggable = true
+frame.Parent = gui
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1,0,0,28)
+title.Position = UDim2.new(0,0,0,0)
+title.Text = "Death Ball - Auto Parry"
+title.TextColor3 = Color3.new(1,1,1)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.SourceSansBold
+title.TextSize = 19
+title.Parent = frame
+
+local toggle = Instance.new("TextButton")
+toggle.Size = UDim2.new(0, 180, 0, 35)
+toggle.Position = UDim2.new(0.5, -90, 0, 38)
+toggle.Text = "Ligar Auto Parry"
+toggle.BackgroundColor3 = Color3.fromRGB(50,120,50)
+toggle.TextColor3 = Color3.new(1,1,1)
+toggle.Font = Enum.Font.SourceSansBold
+toggle.TextSize = 18
+toggle.Parent = frame
+
+local minimize = Instance.new("TextButton")
+minimize.Size = UDim2.new(0,32,0,28)
+minimize.Position = UDim2.new(1,-34,0,0)
+minimize.Text = "_"
+minimize.BackgroundColor3 = Color3.fromRGB(60,60,60)
+minimize.TextColor3 = Color3.new(1,1,1)
+minimize.Font = Enum.Font.SourceSansBold
+minimize.TextSize = 18
+minimize.Parent = frame
+
+minimize.MouseButton1Click:Connect(function()
+    if frame.Size.Y.Offset > 30 then
+        frame.Size = UDim2.new(0,220,0,28)
+        toggle.Visible = false
+    else
+        frame.Size = UDim2.new(0,220,0,100)
+        toggle.Visible = true
+    end
+end)
+
+local autoParryOn = false
+toggle.MouseButton1Click:Connect(function()
+    autoParryOn = not autoParryOn
+    if autoParryOn then
+        toggle.BackgroundColor3 = Color3.fromRGB(120,50,50)
+        toggle.Text = "Desligar Auto Parry"
+        title.Text = "Auto Parry [LIGADO]"
+    else
+        toggle.BackgroundColor3 = Color3.fromRGB(50,120,50)
+        toggle.Text = "Ligar Auto Parry"
+        title.Text = "Death Ball - Auto Parry"
+    end
+end)
+
+-- Função principal de Auto Parry
+local Players = game:GetService("Players")
+local lp = Players.LocalPlayer
+
+function getBall()
+    -- Tenta encontrar o objeto da bola no workspace
+    for _, obj in ipairs(workspace:GetChildren()) do
+        if obj:IsA("Part") and string.find(string.lower(obj.Name), "ball") then
+            return obj
+        end
+    end
+    return nil
+end
+
+function performParry()
+    -- Simula o comando de parry (adaptar para o seu jogo, se necessário)
+    local UserInputService = game:GetService("UserInputService")
+    UserInputService.InputBegan:Fire({KeyCode = Enum.KeyCode.E}) -- Geralmente 'E' é parry.
+end
+
+spawn(function()
+    while true do
+        if autoParryOn and lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") then
+            local ball = getBall()
+            if ball then
+                local dist = (lp.Character.HumanoidRootPart.Position - ball.Position).magnitude
+                -- Se a bola estiver muito próxima (ajuste o valor para sua necessidade)
+                if dist < 15 then
+                    performParry()
+                    wait(0.2)
+                end
+            end
+        end
+        wait(0.05)
+    end
+end)
+
+print("Death Ball Auto Parry Script carregado.")
