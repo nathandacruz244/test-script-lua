@@ -1,3 +1,10 @@
+--[[
+ Death Ball Auto Parry + Interface (Movível, Minimizável, Toggle)
+ Para uso em executor mobile (Delta, Arceus, etc) e PC
+ Tested & optimized for dev use (nathandacruz244)
+]]
+
+-- Serviços
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local RunService = game:GetService("RunService")
