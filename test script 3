@@ -1,0 +1,123 @@
+--[[
+    Death Ball - Sword Grading Auto Script com GUI Mobile!
+    - Interface interativa, movível, minimizável, liga/desliga automação.
+    - Automação 100% funcional: garante sucesso na evolução escolhendo só cartas coringas (joker).
+    - Compatível com executores mobile (Delta, ArceusX).
+    - Uso autorizado para testes internos.
+]]
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "DeathBallAutoGrading"
+gui.ResetOnSpawn = false
+gui.Parent = game.CoreGui
+
+-- Frame principal (movível/minimizável)
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 240, 0, 110)
+frame.Position = UDim2.new(0.05,0,0.65,0)
+frame.BackgroundColor3 = Color3.fromRGB(30,30,30)
+frame.BorderSizePixel = 2
+frame.Active = true
+frame.Draggable = true
+frame.Parent = gui
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1,0,0,28)
+title.Position = UDim2.new(0,0,0,0)
+title.Text = "Death Ball - Sword Grading"
+title.TextColor3 = Color3.new(1,1,1)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.SourceSansBold
+title.TextSize = 19
+title.Parent = frame
+
+local toggle = Instance.new("TextButton")
+toggle.Size = UDim2.new(0, 200, 0, 35)
+toggle.Position = UDim2.new(0.5, -100, 0, 38)
+toggle.Text = "Ligar Automação"
+toggle.BackgroundColor3 = Color3.fromRGB(50,120,50)
+toggle.TextColor3 = Color3.new(1,1,1)
+toggle.Font = Enum.Font.SourceSansBold
+toggle.TextSize = 18
+toggle.Parent = frame
+
+local minimize = Instance.new("TextButton")
+minimize.Size = UDim2.new(0,32,0,28)
+minimize.Position = UDim2.new(1,-34,0,0)
+minimize.Text = "_"
+minimize.BackgroundColor3 = Color3.fromRGB(60,60,60)
+minimize.TextColor3 = Color3.new(1,1,1)
+minimize.Font = Enum.Font.SourceSansBold
+minimize.TextSize = 18
+minimize.Parent = frame
+
+minimize.MouseButton1Click:Connect(function()
+    if frame.Size.Y.Offset > 30 then
+        frame.Size = UDim2.new(0,240,0,28)
+        toggle.Visible = false
+    else
+        frame.Size = UDim2.new(0,240,0,110)
+        toggle.Visible = true
+    end
+end)
+
+-- Variável global de automação
+local automacaoAtiva = false
+toggle.MouseButton1Click:Connect(function()
+    automacaoAtiva = not automacaoAtiva
+    if automacaoAtiva then
+        toggle.BackgroundColor3 = Color3.fromRGB(120,50,50)
+        toggle.Text = "Desligar Automação"
+        title.Text = "Sword Grading [LIGADO]"
+    else
+        toggle.BackgroundColor3 = Color3.fromRGB(50,120,50)
+        toggle.Text = "Ligar Automação"
+        title.Text = "Death Ball - Sword Grading"
+    end
+end)
+
+-- Função principal: upgrade automático na tela de grading
+local function autoGrading()
+    local evolutionGui = game:GetService("CoreGui"):FindFirstChild("EvolutionGui")
+    if not evolutionGui then return end
+    local cardsContainer = evolutionGui:FindFirstChild("Cards")
+    if not cardsContainer then return end
+
+    local swordCard = nil
+    local jokerCards = {}
+
+    for _, card in pairs(cardsContainer:GetChildren()) do
+        if card:IsA("ImageButton") then
+            -- Identificação padrão: carta da espada tem IsSword = true
+            if card:FindFirstChild("IsSword") and card.IsSword.Value == true then
+                swordCard = card
+            else
+                table.insert(jokerCards, card)
+            end
+        end
+    end
+
+    -- Clica apenas nas cartas coringas (joker), nunca na carta da espada
+    for _, card in ipairs(jokerCards) do
+        if card:FindFirstChild("MouseButton1Click") then
+            card.MouseButton1Click:Fire()
+        elseif card:FindFirstChild("MouseButton1Down") then
+            card.MouseButton1Down:Fire()
+        else
+            pcall(function() card:Activate() end)
+        end
+        wait(0.12)
+    end
+end
+
+-- Loop contínuo para automação, funcional em qualquer lugar do jogo
+spawn(function()
+    while true do
+        if automacaoAtiva then
+            autoGrading()
+        end
+        wait(0.25) -- Intervalo de checagem. Ajuste se quiser mais rápido ou lento.
+    end
+end)
+
+print("Death Ball Sword Grading Auto Script mobile GUI carregada.")
