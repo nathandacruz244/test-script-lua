@@ -1,0 +1,146 @@
+-- Death Ball Auto Parry Perfeito (Delta/ArceusX/mobile)
+-- Interface movível, minimizável, liga/desliga parry automático
+-- Detecta a bola e simula clique no botão de parry da interface (PT/EN)
+-- Adapte o nome/texto do botão caso não funcione!
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "DeathBallAutoParry"
+gui.Parent = game.CoreGui
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 240, 0, 110)
+frame.Position = UDim2.new(0.05,0,0.6,0)
+frame.BackgroundColor3 = Color3.fromRGB(30,30,30)
+frame.BorderSizePixel = 2
+frame.Active = true
+frame.Draggable = true
+frame.Parent = gui
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1,0,0,28)
+title.Position = UDim2.new(0,0,0,0)
+title.Text = "Death Ball - Auto Parry"
+title.TextColor3 = Color3.new(1,1,1)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.SourceSansBold
+title.TextSize = 19
+title.Parent = frame
+
+local toggle = Instance.new("TextButton")
+toggle.Size = UDim2.new(0, 200, 0, 35)
+toggle.Position = UDim2.new(0.5, -100, 0, 38)
+toggle.Text = "Ligar Auto Parry"
+toggle.BackgroundColor3 = Color3.fromRGB(50,120,50)
+toggle.TextColor3 = Color3.new(1,1,1)
+toggle.Font = Enum.Font.SourceSansBold
+toggle.TextSize = 18
+toggle.Parent = frame
+
+local minimize = Instance.new("TextButton")
+minimize.Size = UDim2.new(0,32,0,28)
+minimize.Position = UDim2.new(1,-34,0,0)
+minimize.Text = "_"
+minimize.BackgroundColor3 = Color3.fromRGB(60,60,60)
+minimize.TextColor3 = Color3.new(1,1,1)
+minimize.Font = Enum.Font.SourceSansBold
+minimize.TextSize = 18
+minimize.Parent = frame
+
+local aviso = Instance.new("TextLabel")
+aviso.Size = UDim2.new(1,0,0,20)
+aviso.Position = UDim2.new(0,0,0,80)
+aviso.BackgroundTransparency = 1
+aviso.TextColor3 = Color3.fromRGB(255,180,50)
+aviso.Font = Enum.Font.SourceSans
+aviso.TextSize = 15
+aviso.Text = ""
+aviso.Parent = frame
+
+minimize.MouseButton1Click:Connect(function()
+    if frame.Size.Y.Offset > 30 then
+        frame.Size = UDim2.new(0,240,0,28)
+        toggle.Visible = false
+        aviso.Visible = false
+    else
+        frame.Size = UDim2.new(0,240,0,110)
+        toggle.Visible = true
+        aviso.Visible = true
+    end
+end)
+
+local autoParryOn = false
+toggle.MouseButton1Click:Connect(function()
+    autoParryOn = not autoParryOn
+    if autoParryOn then
+        toggle.BackgroundColor3 = Color3.fromRGB(120,50,50)
+        toggle.Text = "Desligar Auto Parry"
+        title.Text = "Auto Parry [LIGADO]"
+    else
+        toggle.BackgroundColor3 = Color3.fromRGB(50,120,50)
+        toggle.Text = "Ligar Auto Parry"
+        title.Text = "Death Ball - Auto Parry"
+        aviso.Text = ""
+    end
+end)
+
+-- Função para detectar a bola no workspace
+function getBall()
+    for _, obj in ipairs(workspace:GetChildren()) do
+        if obj:IsA("Part") and (
+            string.find(string.lower(obj.Name), "ball") or
+            string.find(string.lower(obj.Name), "deathball") or
+            string.find(string.lower(obj.Name), "bola") -- PTBR
+        ) then
+            return obj
+        end
+    end
+    return nil
+end
+
+-- Função para clicar no botão de parry da interface
+function clickParryButton()
+    local found = false
+    for _, obj in ipairs(game:GetService("Players").LocalPlayer.PlayerGui:GetDescendants()) do
+        if obj:IsA("ImageButton") or obj:IsA("TextButton") then
+            local txt = (obj.Text or ""):lower()
+            local nm = obj.Name:lower()
+            -- Adapte os filtros aqui se necessário (PT/EN)
+            if string.find(txt, "parry") or string.find(txt, "defender") or string.find(txt, "defesa") or
+               string.find(nm, "parry") or string.find(nm, "defender") or string.find(nm, "defesa") then
+                if obj:FindFirstChild("MouseButton1Click") then
+                    obj.MouseButton1Click:Fire()
+                elseif obj:FindFirstChild("MouseButton1Down") then
+                    obj.MouseButton1Down:Fire()
+                else
+                    pcall(function() obj:Activate() end)
+                end
+                found = true
+                break
+            end
+        end
+    end
+    if not found then
+        aviso.Text = "Botão de parry não encontrado! Adapte o nome/texto."
+    else
+        aviso.Text = ""
+    end
+    return found
+end
+
+spawn(function()
+    while true do
+        if autoParryOn and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local ball = getBall()
+            if ball then
+                local dist = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - ball.Position).magnitude
+                if dist < 15 then -- Ajuste para sua preferência!
+                    clickParryButton()
+                    wait(0.2)
+                end
+            end
+        end
+        wait(0.05)
+    end
+end)
+
+print("Death Ball Auto Parry Perfeito carregado.")
