@@ -1,0 +1,27 @@
+-- Tenta revelar cartas do grading antes do clique (exploit de vulnerabilidade)
+local found = false
+for _, obj in pairs(game:GetDescendants()) do
+    -- Testa valores comuns
+    if obj:IsA("StringValue") or obj:IsA("IntValue") or obj:IsA("BoolValue") then
+        print("Valor:", obj.Name, obj.Value)
+        found = true
+    end
+    -- Testa atributos
+    for k, v in pairs(obj:GetAttributes()) do
+        print("Atributo:", obj.Name, k, v)
+        found = true
+    end
+    -- Testa texto em UI
+    if obj:IsA("TextLabel") or obj:IsA("TextButton") then
+        if obj.Text and obj.Text ~= "" then
+            print("Texto:", obj.Name, obj.Text)
+            found = true
+        end
+    end
+end
+
+if not found then
+    print("Nenhuma informação suspeita encontrada. Sistema seguro!")
+else
+    print("Possível vulnerabilidade detectada. Reveja prints acima.")
+end
