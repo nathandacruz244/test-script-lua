@@ -1,0 +1,25 @@
+-- Debug: Lista todas as propriedades das cartas na tela de grading
+
+local evolutionGui = game:GetService("CoreGui"):FindFirstChild("EvolutionGui")
+if evolutionGui and evolutionGui:FindFirstChild("Cards") then
+    print("==== Cartas do Grading ====")
+    for i, card in ipairs(evolutionGui.Cards:GetChildren()) do
+        print("Carta #" .. tostring(i) .. " [" .. card.Name .. "]:")
+        -- Lista atributos
+        for _, attr in ipairs(card:GetAttributes()) do
+            print("   Attribute: " .. attr .. " = " .. tostring(card:GetAttribute(attr)))
+        end
+        -- Lista valores filhos
+        for _, child in ipairs(card:GetChildren()) do
+            if child:IsA("BoolValue") or child:IsA("StringValue") or child:IsA("IntValue") then
+                print("   Value: " .. child.Name .. " = " .. tostring(child.Value))
+            end
+        end
+        -- Lista propriedades principais
+        if card:IsA("ImageButton") then
+            print("   Image: " .. tostring(card.Image))
+        end
+    end
+else
+    print("EvolutionGui ou Cards não encontrados!")
+end
