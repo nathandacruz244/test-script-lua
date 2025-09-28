@@ -1,0 +1,62 @@
+-- Death Ball Auto Parry (Simples, funcional, interface mobile)
+-- Para testes internos autorizados
+-- Feito por nathandacruz244
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+
+-- Interface
+local gui = Instance.new("ScreenGui")
+gui.Name = "DB_AutoParry_GUI"
+gui.ResetOnSpawn = false
+gui.Parent = LocalPlayer:FindFirstChildOfClass("PlayerGui") or game:GetService("CoreGui")
+
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.new(0, 190, 0, 78)
+main.Position = UDim2.new(0.7, 0, 0.1, 0)
+main.BackgroundColor3 = Color3.fromRGB(35,35,40)
+main.Active = true
+main.Draggable = true
+
+local title = Instance.new("TextLabel", main)
+title.Size = UDim2.new(1, 0, 0, 24)
+title.Position = UDim2.new(0,0,0,0)
+title.Text = "DeathBall AutoParry"
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.new(1,1,1)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 16
+
+local status = Instance.new("TextLabel", main)
+status.Size = UDim2.new(1, 0, 0, 20)
+status.Position = UDim2.new(0, 0, 0, 26)
+status.BackgroundTransparency = 1
+status.Text = "Status: Desativado"
+status.TextColor3 = Color3.fromRGB(255, 80, 80)
+status.Font = Enum.Font.Gotham
+status.TextSize = 13
+
+local btn = Instance.new("TextButton", main)
+btn.Size = UDim2.new(0, 90, 0, 26)
+btn.Position = UDim2.new(0.5, -45, 1, -30)
+btn.BackgroundColor3 = Color3.fromRGB(69,69,69)
+btn.Text = "Ativar"
+btn.Font = Enum.Font.GothamBold
+btn.TextSize = 15
+btn.TextColor3 = Color3.new(1,1,1)
+
+local min = Instance.new("TextButton", main)
+min.Size = UDim2.new(0, 28, 0, 22)
+min.Position = UDim2.new(1, -32, 0, 3)
+min.BackgroundColor3 = Color3.fromRGB(45,45,45)
+min.Text = "-"
+min.Font = Enum.Font.GothamBold
+min.TextSize = 16
+min.TextColor3 = Color3.new(1,1,1)
+
+local minimized = false
+min.MouseButton1Click:Connect(function()
+    minimized =
